@@ -3,7 +3,7 @@ from types import SimpleNamespace
 import logging
 
 
-from extract import fetch_series_for_date
+from extract import fetch_series_for_date_range
 
 # Configure logging to get status messages on production
 logging.basicConfig(level=logging.INFO)
@@ -24,7 +24,10 @@ def start(request: SimpleNamespace):
 
         # Extraction Process
 
-        raw_series_data = fetch_series_for_date('2024-01-01')
+        raw_series_data = fetch_series_for_date_range(
+            '2024-01-01',
+            '2024-01-31'
+        )
 
         headers = {
             'Access-Control-Allow-Origin': '*',

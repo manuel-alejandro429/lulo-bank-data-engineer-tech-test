@@ -1,27 +1,57 @@
 
 import requests
 import logging
-
+from datetime import datetime, timedelta
 
 # Configure logging to get status messages on production
 logging.basicConfig(level=logging.INFO)
 
 
-def fetch_series_for_date(target_date: str) -> list:
+def fetch_series_for_date_range(start_date_str: str, end_date_str: str) -> list:
 
     """
-    Retrieves the series from TVMaze API for a specific date
+    Retrieves the series from TVMaze API for a specific date range and return ir as raw
 
     Params:
-        target_date (str): Date in 'YYYY-MM-DD' format
+        start_date (str): Start date string (YYYY-MM-DD)
+        end_date (str): End date string (YYYY-MM-DD)
 
     Return:
-        list: List of series (JSON)
+        list: List of raw series extracted (JSON)
     """
 
-    url = f"http://api.tvmaze.com/schedule/web?date={target_date}"
-    logging.info(f" Getting Data for: {target_date}")
-    response = requests.get(url)
-    response.raise_for_status()
+    # Params Validation
+    try:
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
+    except ValueError as e:
+        logging.error(f"   Invalid data format: {e}")
+        return []
 
-    return response.json()
+    if start_date > end_date:
+        logging.error("   Start_date should be lower than end_date")
+        return []
+
+    # Defining output list
+    all_raw_data = []
+    current_date = start_date
+
+    # Getting data for each day in the range.
+    while current_date <= end_date:
+
+        date_str = current_date.isoformat()
+        url = f"http://api.tvmaze.com/schedule/web?date={date_str}"
+        logging.info(f"   Consulting API for: {date_str}...")
+
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            data = response.json()
+            all_raw_data.extend(data)
+
+        except requests.RequestException as e:
+            logging.error(f"   Error retrieving data for {date_str}: {e}")
+
+        current_date += timedelta(days=1)
+
+    return all_raw_data
