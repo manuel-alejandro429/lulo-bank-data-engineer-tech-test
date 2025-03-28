@@ -2,7 +2,10 @@ from flask import abort
 from types import SimpleNamespace
 import logging
 
-# logging para visualización de mensajes/logs en producción
+
+from extract import fetch_series_for_date
+
+# Configure logging to get status messages on production
 logging.basicConfig(level=logging.INFO)
 
 
@@ -17,12 +20,11 @@ def start(request: SimpleNamespace):
         return '', 204, headers
 
     elif request.method == 'POST':
-        logging.info("Iniciando proceso de extracción de datos desde API...")
+        logging.info("  Starting extraction process from API...")
 
-        #
-        #
-        #
-        #
+        # Extraction Process
+
+        raw_series_data = fetch_series_for_date('2024-01-01')
 
         headers = {
             'Access-Control-Allow-Origin': '*',
