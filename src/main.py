@@ -1,6 +1,8 @@
 from flask import abort
 from types import SimpleNamespace
+import pandas as pd
 import logging
+
 
 
 from extract import fetch_series_for_date_range
@@ -33,6 +35,10 @@ def start(request: SimpleNamespace):
         # Saving Raw data in json folder
         save_json(raw_series_data, 'january_2024.json')
 
+        # Converting JSON file to DataFrame
+
+        raw_series_data_df = pd.DataFrame(raw_series_data)
+
 
 
         headers = {
@@ -41,7 +47,7 @@ def start(request: SimpleNamespace):
             'Access-Control-Allow-Headers': '*'
         }
 
-        return 'Extracción completada exitosamente.', 200, headers
+        return 'Success Extraction.', 200, headers
 
     else:
         return abort(405)
