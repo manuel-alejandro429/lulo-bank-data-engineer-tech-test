@@ -12,7 +12,7 @@ def fetch_series_for_date_range(start_date_str: str, end_date_str: str) -> list:
     """
     Retrieves the series from TVMaze API for a specific date range and return ir as raw
 
-    Params:
+    Parameters:
         start_date (str): Start date string (YYYY-MM-DD)
         end_date (str): End date string (YYYY-MM-DD)
 
