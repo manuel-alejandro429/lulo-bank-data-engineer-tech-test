@@ -71,3 +71,59 @@ def split_dataframe(df: pd.DataFrame):
     show_genres = exploded.merge(dim_genres, on='genre_name')[['show_id', 'genre_id']].drop_duplicates()
 
     return fact_episodes, dim_shows, dim_genres, show_genres
+
+
+def clean_fact_episodes(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Args:
+        df: DataFrame corresponding to the fact table in this project:  fact episodes
+
+    Returns: DataFrame with cleaned fields
+    """
+    df = df.dropna(subset=['episode_id', 'show_id']) # Foreign Keys
+    df['episode_air_date'] = pd.to_datetime(df['episode_air_date'], errors='coerce')
+    df = df.drop_duplicates()
+
+    return df
+
+def clean_dim_shows(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Args: DataFrame corresponding to the shows dimension table in this project
+        df:
+
+    Returns: DataFrame with cleaned fields
+    """
+
+    df = df.dropna(subset=['show_id'])  # Primary Key
+    df = df.drop_duplicates()
+    df['show_avg_runtime'] = df['show_avg_runtime'].fillna(0)
+
+    return df
+
+def clean_dim_genres(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Args:
+        df:  DataFrame corresponding to the genres dimension table in this project
+
+    Returns: DataFrame with cleaned fields
+    """
+
+    df['genre_name'] = df['genre_name'].str.strip()
+    df = df.drop_duplicates()
+
+    return df
+
+def clean_show_genres(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Args:
+        df: DataFrame corresponding to the show genres table in this project
+
+    Returns: DataFrame with cleaned fields
+
+    """
+    df = df.dropna(subset=['show_id', 'genre_id'])
+    df = df.drop_duplicates()
+
+    return df
+
+

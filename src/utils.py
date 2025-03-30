@@ -4,6 +4,7 @@ import json
 import logging
 from ydata_profiling import ProfileReport
 import os
+import pandas as pd
 
 
 def save_json(data: list, filename: str, folder: str = "../json"):
@@ -34,7 +35,7 @@ def generate_profiling_report(df, filename: str, folder: str = "../profiling"):
     Parameters:
         df (pd.DataFrame): DataFrame to analyze
         filename (str): Name of the HTML output file
-        folder (str): Target folder to save the profiling report
+        folder (str)a: Target folder to save the profiling report
     """
     try: # I Use try because in this step some issues could raise, for instance: creating the profiling
 
@@ -53,4 +54,23 @@ def generate_profiling_report(df, filename: str, folder: str = "../profiling"):
 
     except Exception as e:
         logging.error(f"Error generating profiling report: {e}")
+
+
+def save_parquet(df: pd.DataFrame, filename: str, folder: str = "../data"):
+    """
+    Save a DataFrame as Parquet with snappy compression.
+    Args:
+        df (pd.DataFrame): DataFrame to save
+        filename (str): Name of the output Parquet file (e.g. 'fact_episodes.parquet')
+        folder (str): Destination folder
+    """
+
+    output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), folder))
+    os.makedirs(output_dir, exist_ok=True)
+
+    filepath = os.path.join(output_dir, filename)
+    df.to_parquet(filepath, compression='snappy', index=False)
+
+    logging.info(f" Saved Parquet: {filepath}")
+
 
