@@ -7,14 +7,14 @@ from datetime import datetime, timedelta
 logging.basicConfig(level=logging.INFO)
 
 
-def fetch_series_for_date_range(start_date_str: str, end_date_str: str) -> list:
+def fetch_episodes_for_date_range(start_date_str: str, end_date_str: str) -> list:
 
     """
     Retrieves the series from TVMaze API for a specific date range and return ir as raw
 
     Parameters:
-        start_date (str): Start date string (YYYY-MM-DD)
-        end_date (str): End date string (YYYY-MM-DD)
+        start_date_str (str): Start date string (YYYY-MM-DD)
+        end_date_str (str): End date string (YYYY-MM-DD)
 
     Return:
         list: List of raw series extracted (JSON)
@@ -55,3 +55,4 @@ def fetch_series_for_date_range(start_date_str: str, end_date_str: str) -> list:
         current_date += timedelta(days=1)
 
     return all_raw_data
+

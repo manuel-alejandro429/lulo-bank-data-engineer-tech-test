@@ -5,8 +5,9 @@ import logging
 
 
 
-from extract import fetch_series_for_date_range
+from extract import fetch_episodes_for_date_range
 from utils import save_json, generate_profiling_report
+from process import unnest_fields, split_dataframe
 
 # Configure logging to get status messages on production
 logging.basicConfig(level=logging.INFO)
@@ -27,29 +28,33 @@ def start(request: SimpleNamespace):
 
 
         # Extraction Process
-        raw_series_data = fetch_series_for_date_range(
+        raw_episodes_data = fetch_episodes_for_date_range(
             '2024-01-01',
             '2024-01-31'
         )
 
         # Saving Raw data in json folder
-        save_json(raw_series_data, 'january_2024.json')
+        save_json(raw_episodes_data, 'january_2024.json')
 
-        #TODO: Unnest Necessary data
-        #TODO: Convert to DataFrame
-        #TODO: Split DataFrame in Fact and dimention tables without processing the columns
+        # Unnesting the necessary fields
+        episodes_data_unnested = map(unnest_fields, raw_episodes_data)
+        episodes_data_unnested = pd.DataFrame(episodes_data_unnested)
+
+        # Splitting data in different tables to construct the sql lite database structure
+        # Also in the following step the DataFrames are created
+        (
+            fact_episodes_df, dim_shows_df,
+            dim_genres_df, show_genres_df
+        ) = split_dataframe(episodes_data_unnested)
+
         #TODO: Do profiling to each data frame, then process
 
-        # Converting JSON file to DataFrame
-
-        raw_series_data_df = pd.DataFrame(raw_series_data)
-
-        # Generate the profiling report to analyse in general the data status
-
+        # Generate the profiling report to analyse the data status in each table
         generate_profiling_report(
-            raw_series_data_df,
-            "tvmaze_january_2024_profile.html"
+            fact_episodes_df,
+            "tvmaze_january_2024_episodes_profile.html"
         )
+
 
         headers = {
             'Access-Control-Allow-Origin': '*',
