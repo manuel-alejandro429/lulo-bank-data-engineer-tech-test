@@ -1,10 +1,12 @@
 # File Created to develop functions that can be used for multiple projects
 
-import json
-import logging
 from ydata_profiling import ProfileReport
-import os
 import pandas as pd
+import logging
+import sqlite3
+import json
+import os
+
 
 
 def save_json(data: list, filename: str, folder: str = "../json"):
@@ -74,3 +76,24 @@ def save_parquet(df: pd.DataFrame, filename: str, folder: str = "../data"):
     logging.info(f" Saved Parquet: {filepath}")
 
 
+def save_dataframes_to_sqlite(dataframes: dict[str, pd.DataFrame], db_path: str = "../db/database.db"):
+    """
+    Save multiple DataFrames in a SQLite Data Base.
+
+    Args:
+        dataframes (dict): Dict with the name of the tables as the key and the DataFrames as the value
+        db_path (str): Rout to the SQLite DB
+    """
+    try:
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        conn = sqlite3.connect(db_path)
+
+        for table_name, df in dataframes.items():
+            df.to_sql(table_name, conn, if_exists="replace", index=False)
+            logging.info(f" '{table_name}' table  saved with  {len(df)} records.")
+
+        conn.close()
+        logging.info(f" DB created in : {db_path}")
+
+    except Exception as e:
+        logging.error(f" Issue saving in SQLite DB: {e}")

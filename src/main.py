@@ -1,12 +1,16 @@
-from flask import abort
 from types import SimpleNamespace
+from flask import abort
 import pandas as pd
+import sqlite3
 import logging
 
-from extract import fetch_episodes_for_date_range
-from utils import save_json, generate_profiling_report, save_parquet
 from process import (unnest_fields, split_dataframe, clean_fact_episodes,
                      clean_dim_shows, clean_dim_genres, clean_show_genres)
+from extract import fetch_episodes_for_date_range
+from utils import (save_json, generate_profiling_report, save_parquet,
+                   save_dataframes_to_sqlite)
+from queries import (query_avg_runtime_show, query_shows_by_genre,
+                     query_unique_show_domains)
 
 # Configure logging to get status messages on production
 logging.basicConfig(level=logging.INFO)
@@ -65,6 +69,17 @@ def start(request: SimpleNamespace):
         save_parquet(dim_genres_df, 'dim_genres.parquet')
         save_parquet(show_genres_df, 'show_genres.parquet')
 
+        # Creating DB and saving the parquet files into SQLite DB
+        dataframes = {
+            "fact_episodes": fact_episodes_df,
+            "dim_shows": dim_shows_df,
+            "dim_genres": dim_genres_df,
+            "show_genres": show_genres_df,
+        }
+
+        save_dataframes_to_sqlite(dataframes, "../db/tvmaze.db")
+
+
         headers = {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'POST',
@@ -78,4 +93,15 @@ def start(request: SimpleNamespace):
 
 
 if __name__ == '__main__':
+
+    # Executing the start( ) function that contains the flow
     start(SimpleNamespace(method='POST'))
+
+    # Running SQL Queries to the SQLite Data Base
+    db_path = "../db/tvmaze.db"
+    conn = sqlite3.connect(db_path)
+
+    # Queries results:
+    show_avg_runtime = pd.read_sql_query(query_avg_runtime_show, conn)
+    shows_by_genre = pd.read_sql_query(query_shows_by_genre, conn)
+    unique_show_domains = pd.read_sql_query(query_unique_show_domains, conn)

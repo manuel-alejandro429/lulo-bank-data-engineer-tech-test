@@ -1,7 +1,7 @@
 
+from datetime import datetime, timedelta
 import requests
 import logging
-from datetime import datetime, timedelta
 
 # Configure logging to get status messages on production
 logging.basicConfig(level=logging.INFO)
