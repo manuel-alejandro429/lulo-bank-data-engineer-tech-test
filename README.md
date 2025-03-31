@@ -86,6 +86,7 @@ After execution, the pipeline performs SQL queries to obtain requested calculate
 - **Unique Official Website Domains**
 
 SQL queries are defined in [`queries.py`](src/queries.py).
+When executing the entire code at the end there are some print() sentences that will showcase some rows resulting from the previous queries. Is highly recommended to dive into the code to better explore and visualize the output, the prints( ) just show twice rows.
 
 ---
 

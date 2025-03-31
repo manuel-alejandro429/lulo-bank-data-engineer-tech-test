@@ -105,3 +105,10 @@ if __name__ == '__main__':
     show_avg_runtime = pd.read_sql_query(query_avg_runtime_show, conn)
     shows_by_genre = pd.read_sql_query(query_shows_by_genre, conn)
     unique_show_domains = pd.read_sql_query(query_unique_show_domains, conn)
+
+    print('\n------------ Average Run Time per show ------------ \n')
+    print(show_avg_runtime)
+    print('\n------------ Number of shows by genre ------------ \n')
+    print(shows_by_genre)
+    print('\n------------ Unique domains associated to the shows ------------ \n')
+    print(unique_show_domains)
